@@ -11,5 +11,8 @@ router.post('/addTask', tasksController.addTask, (req, res) => {
 router.delete('/deleteTask', tasksController.deleteTask, (req, res) => {
   res.status(200).send('deleteTask successful');
 });
+router.put('/updateTask', tasksController.updateTask, (req, res) => {
+  res.status(200).send('updateTask successful');
+});
 
 module.exports = router;

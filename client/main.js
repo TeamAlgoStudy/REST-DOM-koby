@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const span = document.createElement('span');
           const deleteBtn = document.createElement('button');
           deleteBtn.innerText = 'Delete';
+          const updateBtn = document.createElement('button');
+          updateBtn.innerText = 'Update';
 
           //NOTE: need to add DELETE method to make the button work
 
@@ -29,7 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
           // task.name = el._id;
           task.setAttribute('data-id', el._id);
           deleteBtn.setAttribute('data-id', el._id);
+          updateBtn.setAttribute('data-id', el._id);
+
           task.appendChild(span);
+          task.appendChild(updateBtn);
           task.appendChild(deleteBtn);
           ul.appendChild(task);
 
@@ -39,6 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteTask(deleteId);
             input.focus();
           });
+
+          updateBtn.addEventListener('click', (e) => {
+            const updateId = e.target.closest('li').getAttribute('data-id');
+            console.log('LINE 50 updateId ID=====>', updateId);
+            updateTask(updateId);
+            input.focus();
+          });
+
         });
 
         // return oneTask;
@@ -47,6 +60,28 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error in GETALL', error);
       });
   }
+//TODO: make the update button work with the backend reqest.
+  function updateTask(updateId) {
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'Application/json' },
+      body: JSON.stringify({ _id: deleteId }),
+    };
+    // console.log('line 51: deleteId = ', requestOptions);
+    fetch('api/updateTask', requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('failed to delete task');
+        }
+        return response.text();
+      })
+      .then((result) => {
+        console.log('delete result', result);
+        document.dispatchEvent(new Event('taskDeleted'));
+      })
+      .catch((error) => console.error(error));
+  }
+
 
   function deleteTask(deleteId) {
     const requestOptions = {

@@ -20,11 +20,24 @@ tasksController.getItems = async (req, res, next) => {
 tasksController.deleteTask = async (req, res, next) => {
   console.log('in the deleteTask Controller');
   try {
-    const taskToBeDeleted = req.body
-    console.log('Taskto be deleted in Controller',taskToBeDeleted)
+    const taskToBeDeleted = req.body;
+    console.log('Taskto be deleted in Controller', taskToBeDeleted);
     res.locals.deleteThisTask = await models.Tasks.findByIdAndDelete(
-      req.body
+      taskToBeDeleted
     );
+    return next();
+  } catch (err) {
+    console.error('err occurred in deleteTask controller', err);
+    return next(err.message);
+  }
+};
+tasksController.updateTask = async (req, res, next) => {
+  console.log('in the deleteTask Controller');
+  const updateTest = { task: 'updated task2' };
+  const updateId = { _id: '663dff451cabfc062a026b5c' };
+
+  try {
+    const updatereq = await models.Tasks.findOneAndUpdate(updateId, updateTest);
     return next();
   } catch (err) {
     console.error('err occurred in deleteTask controller', err);
