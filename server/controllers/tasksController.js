@@ -20,10 +20,10 @@ tasksController.getItems = async (req, res, next) => {
 tasksController.deleteTask = async (req, res, next) => {
   console.log('in the deleteTask Controller');
   try {
-    const taskToBeDeleted = req.body.id
-    // console.log('Taskto be deleted in Controller',taskToBeDeleted)
+    const taskToBeDeleted = req.body
+    console.log('Taskto be deleted in Controller',taskToBeDeleted)
     res.locals.deleteThisTask = await models.Tasks.findByIdAndDelete(
-      taskToBeDeleted
+      req.body
     );
     return next();
   } catch (err) {

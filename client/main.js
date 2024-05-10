@@ -23,17 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
           deleteBtn.innerText = 'Delete';
 
           //NOTE: need to add DELETE method to make the button work
-          deleteBtn.addEventListener('click', () => {
-            deleteTask();
-            input.focus();
-          });
 
           task.textContent = el.task;
-          task.id = el._id;
-          task.name = el._id;
+          // task.id = el._id;
+          // task.name = el._id;
+          task.setAttribute('data-id', el._id);
+          deleteBtn.setAttribute('data-id', el._id);
           task.appendChild(span);
           task.appendChild(deleteBtn);
           ul.appendChild(task);
+
+          deleteBtn.addEventListener('click', (e) => {
+            const deleteId = e.target.closest('li').getAttribute('data-id');
+            console.log('LINE 28 DELETE ID=====>', deleteId);
+            deleteTask(deleteId);
+            input.focus();
+          });
         });
 
         // return oneTask;
@@ -43,22 +48,27 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  function deleteTask() {
-    const deleteId = document.getSelection('li');
-    console.log(deleteId);
+  function deleteTask(deleteId) {
     const requestOptions = {
       method: 'DELETE',
       headers: { 'Content-Type': 'Application/json' },
-      body: deleteId,
+      body: JSON.stringify({ _id: deleteId }),
     };
+    // console.log('line 51: deleteId = ', requestOptions);
     fetch('api/deleteTask', requestOptions)
-      .then((response) => response.text())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('failed to delete task');
+        }
+        return response.text();
+      })
       .then((result) => {
-        console
-          .log('delete result', result)
-          .catch((error) => console.error(error));
-      });
+        console.log('delete result', result);
+        document.dispatchEvent(new Event('taskDeleted'));
+      })
+      .catch((error) => console.error(error));
   }
+
   function addTask() {
     const postData = JSON.stringify({
       task: input.value,
@@ -88,6 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
     input.focus();
   };
   document.addEventListener('taskAdded', () => {
+    getAll();
+  });
+  document.addEventListener('taskDeleted', () => {
     getAll();
   });
   getAll();
