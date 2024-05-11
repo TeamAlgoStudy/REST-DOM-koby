@@ -32,12 +32,17 @@ tasksController.deleteTask = async (req, res, next) => {
   }
 };
 tasksController.updateTask = async (req, res, next) => {
-  console.log('in the deleteTask Controller');
-  const updateTest = { task: 'updated task2' };
-  const updateId = { _id: '663dff451cabfc062a026b5c' };
+  console.log('in the UpdateTask Controller');
+
+  console.log('udpate task REQ.BODY', req.body);
+
+  const filter = { _id: req.body._id };
+  const update = { task: req.body.task };
 
   try {
-    const updatereq = await models.Tasks.findOneAndUpdate(updateId, updateTest);
+    const updatereq = await models.Tasks.findOneAndUpdate(filter, update, {
+      new: true,
+    });
     return next();
   } catch (err) {
     console.error('err occurred in deleteTask controller', err);

@@ -24,18 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
           const updateBtn = document.createElement('button');
           updateBtn.innerText = 'Update';
 
-          //NOTE: need to add DELETE method to make the button work
-
           task.textContent = el.task;
-          // task.id = el._id;
+          task.id = el._id;
           // task.name = el._id;
           task.setAttribute('data-id', el._id);
           deleteBtn.setAttribute('data-id', el._id);
           updateBtn.setAttribute('data-id', el._id);
 
           task.appendChild(span);
-          task.appendChild(updateBtn);
-          task.appendChild(deleteBtn);
+          task.append(updateBtn);
+          task.append(deleteBtn);
           ul.appendChild(task);
 
           deleteBtn.addEventListener('click', (e) => {
@@ -47,11 +45,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
           updateBtn.addEventListener('click', (e) => {
             const updateId = e.target.closest('li').getAttribute('data-id');
-            console.log('LINE 50 updateId ID=====>', updateId);
-            updateTask(updateId);
+    
+            const taskToBeUpdated = document.getElementById(updateId);
+          
+            const updatePrompt = prompt('Enter new update:', ''querysel[0]'');
+            if (!updatePrompt == null || !updatePrompt == '') {
+              updateTask(updateId, updatePrompt);
+            }
+            // document.getElementById(updateId).html = updatePrompt;
+
+            console.log('updateId====>', updateId);
+            console.log('updatePrompt=====>', updatePrompt);
+            console.log('taskToBeUpdated', taskToBeUpdated);
+
             input.focus();
           });
-
         });
 
         // return oneTask;
@@ -60,28 +68,27 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error in GETALL', error);
       });
   }
-//TODO: make the update button work with the backend reqest.
-  function updateTask(updateId) {
+
+  function updateTask(updateId, updatePrompt) {
     const requestOptions = {
       method: 'PUT',
       headers: { 'Content-Type': 'Application/json' },
-      body: JSON.stringify({ _id: deleteId }),
+      body: JSON.stringify({ _id: updateId, task: updatePrompt }),
     };
-    // console.log('line 51: deleteId = ', requestOptions);
+    console.log('line 83: UpdateReqeustOpt = ', requestOptions);
     fetch('api/updateTask', requestOptions)
       .then((response) => {
         if (!response.ok) {
-          throw new Error('failed to delete task');
+          throw new Error('failed to update task');
         }
         return response.text();
       })
       .then((result) => {
-        console.log('delete result', result);
-        document.dispatchEvent(new Event('taskDeleted'));
+        console.log('update result', result);
+        document.dispatchEvent(new Event('taskUpdated'));
       })
       .catch((error) => console.error(error));
   }
-
 
   function deleteTask(deleteId) {
     const requestOptions = {
@@ -136,6 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
     getAll();
   });
   document.addEventListener('taskDeleted', () => {
+    getAll();
+  });
+  document.addEventListener('taskUpdated', () => {
     getAll();
   });
   getAll();
